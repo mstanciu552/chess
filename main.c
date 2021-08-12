@@ -33,7 +33,7 @@ int main(void) {
   SDL_Renderer *rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
   SDL_Rect *rectangles = create_rect_array();
 
-  SDL_Surface *surface = load_surface("./templates/white_king.png");
+  SDL_Surface *surface = load_surface("./templates/black_bishop.png");
   if (surface == NULL) exit(3);
 
   create_board(rend, rectangles);

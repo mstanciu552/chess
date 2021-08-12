@@ -29,16 +29,16 @@ void create_board(SDL_Renderer *rend, SDL_Rect *rectangles) {
   for (int i = 0; i < WIDTH; i++) {
     for (int j = 0; j < HEIGHT; j+=2) {
       if (i % 2 == 0) {
-        SDL_SetRenderDrawColor(rend, 0, 0, 255, 255);
+        SDL_SetRenderDrawColor(rend, 119, 149, 87, 255);
         SDL_RenderFillRect(rend, &rectangles[j + i * HEIGHT]);
 
-        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(rend, 237, 237, 208, 255);
         SDL_RenderFillRect(rend, &rectangles[j + 1 + i * HEIGHT]);
       } else {
-        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(rend, 237, 237, 208, 255);
         SDL_RenderFillRect(rend, &rectangles[j + i * HEIGHT]);
 
-        SDL_SetRenderDrawColor(rend, 0, 0, 255, 255);
+        SDL_SetRenderDrawColor(rend, 119, 149, 87, 255);
         SDL_RenderFillRect(rend, &rectangles[j + 1 + i * HEIGHT]);
       }
     }
