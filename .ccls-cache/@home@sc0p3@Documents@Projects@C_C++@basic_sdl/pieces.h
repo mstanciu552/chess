@@ -32,14 +32,18 @@ typedef struct Piece {
 
 bool is_valid(Piece piece, Position pos);
 SDL_Surface *load_surface(string path);
-void load_texture(SDL_Renderer *rend, SDL_Surface *surface, SDL_Rect *rectangles);
-Piece add_piece_to_object(SDL_Surface *surface, Pieces type, Color color);
-SDL_Texture **get_pieces_texture_array(SDL_Renderer *rend, string path);
+void load_texture(SDL_Renderer *rend, Piece piece);
+Piece new_piece(SDL_Surface *surface, Position position, Pieces type, Color color);
+void move_piece(Piece piece, Position position);
+Position calculate_square(Position position);
+Position calc_start(Pieces type, Color color);
 
 #endif // PIECES_H_
 
 #ifdef PIECES_IMPLEMENTATION
 
+// TODO Finish checking based on type
+// Position start from 0 and end at 7 for both rows and columns
 bool is_valid(Piece piece, Position pos) {
   switch(piece.type) {
     case PAWN:
@@ -63,46 +67,116 @@ bool is_valid(Piece piece, Position pos) {
 
 SDL_Surface *load_surface(string path) {
   SDL_Surface *loaded_surface = IMG_Load(path);
-
   if (loaded_surface == NULL) {
     printf("Error loading surface");
     return NULL;
   }
-
   return loaded_surface;
 }
 
-void load_texture(SDL_Renderer *rend, SDL_Surface *surface, SDL_Rect *rectangles) {
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface);
+void load_texture(SDL_Renderer *rend,  Piece piece) {
+  SDL_Rect rectangle = {.x = piece.pos.x, .y = piece.pos.y, .w = 80, .h = 80};
+
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, piece.surface);
   SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
-  SDL_FreeSurface(surface);
-  SDL_QueryTexture(texture, NULL, NULL, &rectangles[0].w, &rectangles[0].h);
-  SDL_RenderCopy(rend, texture, &rectangles[0], &rectangles[0]);
+  SDL_FreeSurface(piece.surface);
+  SDL_QueryTexture(texture, NULL, NULL, &rectangle.w, &rectangle.h);
+  SDL_RenderCopy(rend, texture, NULL, &rectangle);
 
   SDL_RenderPresent(rend); // Show what's drawn to the screen
-  /* SDL_Delay(1000 / 60); */
 
   SDL_DestroyTexture(texture);
 }
 
-Piece add_piece_to_object(SDL_Surface *surface, Pieces type, Color color) {
-  Piece p = {.type = type, .pos = {.x = 0, .y = 0}, .surface = surface, .color = color};
+Piece new_piece(SDL_Surface *surface, Position position, Pieces type, Color color) {
+  Piece p = {.type = type, .pos = position, .surface = surface, .color = color};
   return p;
 }
 
-SDL_Texture **get_pieces_texture_array(SDL_Renderer *rend, string path) {
-  SDL_Texture **textures = (SDL_Texture**) malloc(16 * sizeof(SDL_Texture*));
-  SDL_Surface *surface = load_surface(path);
-  SDL_Texture *tex = SDL_CreateTextureFromSurface(rend, surface);
-  SDL_Rect box = {.x = 0, .y = 0, .w = 70, .h = 70};
+void move_piece(Piece piece, Position position) {
+  piece.pos = position;
+}
 
-  SDL_RenderCopy(rend, tex, &box, NULL);
-  SDL_RenderPresent(rend);
+Position calculate_square(Position position) {
+  Position normalized_position = {.x = 0, .y = 0};
 
-  textures[0] = tex;
+  normalized_position.x = (position.x * 80) + 12;
+  normalized_position.y = (position.y * 80) + 12;
 
-  return textures;
+  return normalized_position;
+}
+
+// TODO Finish this for all piece types
+Position calc_start(Pieces type, Color color) {
+  Position position = {.x = 0, .y = 0};
+
+  switch(type) {
+    case PAWN:
+      if (color == WHITE) { 
+        position.x = 0;
+        position.y = 1;
+      }
+      else if (color == BLACK) {
+        position.x = 0;
+        position.y = 6;
+      }
+      break;
+    case BISHOP:
+      if (color == WHITE) { 
+        position.x = 2;
+        position.y = 0;
+      }
+      else if (color == BLACK) {
+        position.x = 3;
+        position.y = 7;
+      }
+      break;
+    case ROOK:
+      if (color == WHITE) { 
+        position.x = 0;
+        position.y = 0;
+      }
+      else if (color == BLACK) {
+        position.x = 0;
+        position.y = 7;
+      }
+      break;
+    case KNIGHT:
+      if (color == WHITE) { 
+        position.x = 1;
+        position.y = 0;
+      }
+      else if (color == BLACK) {
+        position.x = 0;
+        position.y = 6;
+      }
+      break;
+    case QUEEN:
+      if (color == WHITE) { 
+        position.x = 3;
+        position.y = 0;
+      }
+      else if (color == BLACK) {
+        position.x = 0;
+        position.y = 6;
+      }
+      break;
+    case KING:
+      if (color == WHITE) { 
+        position.x = 4;
+        position.y = 0;
+      }
+      else if (color == BLACK) {
+        position.x = 0;
+        position.y = 6;
+      }
+      break;
+    default:
+      printf("Invalid Piece");
+      break;
+    }
+  return position;
 }
  
 #endif // PIECES_IMPLEMENTATION
